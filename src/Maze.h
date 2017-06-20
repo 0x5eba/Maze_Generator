@@ -18,7 +18,6 @@ private:
 		int x, y;
 		bool walls[4] = { true, true, true, true };
 		bool visited;
-		int numb;
 	};
 
 
@@ -27,16 +26,13 @@ private:
 	void draw();
 	void removeWall(Cell& current, Cell& next);
 	
+	std::vector<std::vector<Cell>> grid;
+	std::vector<Cell> stack;
+	Cell current;
+	
 
-
-	Cell* grid[40][40]{};
-	Cell current{};
-	std::vector<Cell> stack{};
-
-	const int w = 40;
-	const int cols = 400 / w;
-	const int rows = 400 / w;
-	bool pop;
-
-	int conta = 1;	
+	
+	const int cols = 20;
+	const int rows = 20;
+	bool pop;	
 };
