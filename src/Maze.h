@@ -10,7 +10,7 @@ class Maze {
 public: 
 	Maze() {};
 	~Maze() {};
-	void setup();
+	void initialize();
 
 private:
 	struct Cell
@@ -18,21 +18,24 @@ private:
 		int x, y;
 		bool walls[4] = { true, true, true, true };
 		bool visited;
+		bool solve;
 	};
 
-
+private:
 	Cell checkNeightbors(const int& a, const int& b);
 	void drawLines(const int& a, const int& b);
+	void setup();
 	void draw();
 	void removeWall(Cell& current, Cell& next);
-	
+
+private:
 	std::vector<std::vector<Cell>> grid;
 	std::vector<Cell> stack;
 	Cell current;
-	
 
-	
-	const int cols = 20;
-	const int rows = 20;
-	bool pop;	
+	int cols;
+	int rows;
+	bool pop;
+	bool reached;
+	int coordinateX, coordinateY;	
 };
