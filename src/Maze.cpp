@@ -1,6 +1,34 @@
 #pragma once
 #include "Maze.h"
 
+void Maze::initialize()
+{
+	reached = false;
+	do {
+		do {
+			std::cout << "\nInsert a number of total rows: ";
+			std::cin >> Maze::rows;
+			if (Maze::rows < 0 || Maze::rows > 45)
+				std::cout << "\nInsert a number between 0 and 45\n";
+		} while (Maze::rows < 0 || Maze::rows > 45);
+
+		do
+		{
+			std::cout << "Insert a number of total columns: ";
+			std::cin >> Maze::cols;
+			if (Maze::cols < 0 || Maze::cols > 45)
+				std::cout << "\nInsert a number between 0 and 45\n";
+		} while (Maze::cols < 0 || Maze::cols > 45);
+
+		if (Maze::rows != Maze::cols)
+			std::cout << "\nInsert 2 equal numbers\n\n";
+	} while (Maze::rows != Maze::cols);
+
+	coordinateX = cols - 1;
+	coordinateY = rows - 1;
+	Maze::setup();
+}
+
 void Maze::setup()
 {
 	grid.resize(rows, std::vector<Maze::Cell>(cols));
@@ -8,16 +36,17 @@ void Maze::setup()
 	{
 		for (int b = 0; b < cols; b++)
 		{
-			
-			grid[a][b] = { a, b,{ true, true, true, true }, false };
+			grid[a][b] = { a, b,{ true, true, true, true }, false, false };
 		}
 	}
 
 	current = grid[0][0];
 	grid[0][0].visited = true;
+	grid[0][0].solve = true;
 
 	int a = current.x, b = current.y;
 	stack.push_back(current);
+
 	do
 	{
 		//Step 1
@@ -25,8 +54,14 @@ void Maze::setup()
 		a = next.x;
 		b = next.y;
 		grid[a][b].visited = true;
+		
 		if (!pop)
 		{
+			if (reached == false)
+				grid[a][b].solve = true;	
+			if (a == coordinateX && b == coordinateY)
+				reached = true;
+
 			//Step 2
 			stack.push_back(current);
 
@@ -35,11 +70,19 @@ void Maze::setup()
 
 			//Step 4
 			current = next;
+			
 		}
 		else {
+			if (reached == false)
+				grid[a][b].solve = false;
+
 			current = stack[stack.size() - 1];
 			a = current.x;
 			b = current.y;
+
+			if (reached == false)
+				grid[a][b].solve = false;
+
 			stack.pop_back();
 		}
 	} while (stack.size() > 0);
@@ -67,7 +110,16 @@ void Maze::drawLines(const int& a, const int& b)
 			std::cout << " ";
 		}
 
-		std::cout << "*";
+		
+		if (grid[a][b].solve)
+		{
+			std::cout << "*";
+		}
+		else {
+			std::cout << " ";
+		}
+
+
 		if (grid[a][b].walls[2])
 		{
 			std::cout << "_";
@@ -169,6 +221,7 @@ Maze::Cell Maze::checkNeightbors(const int& a, const int& b)
 		arrToRandomNumber[3] = -1;
 	}
 
+
 	int contameno1 = 0;
 	for (int a = 0; a < arrToRandomNumber.size(); ++a)
 	{
@@ -210,11 +263,8 @@ Maze::Cell Maze::checkNeightbors(const int& a, const int& b)
 	}
 	else {
 		if (stack.size() > 0)
-		{
 			pop = true;
-		}
 	}
-
 }
 
 void Maze::removeWall(Maze::Cell& current, Maze::Cell& next)
