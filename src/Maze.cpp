@@ -3,18 +3,18 @@
 
 void Maze::setup()
 {
+	grid.resize(rows, std::vector<Maze::Cell>(cols));
 	for (int a = 0; a < rows; a++)
 	{
 		for (int b = 0; b < cols; b++)
 		{
-			grid[a][b] = new Cell{ a, b,{ true, true, true, true }, false };
-			if (a == 0 && b == 0)
-			{
-				current = *grid[a][b];
-				continue;
-			}
+			
+			grid[a][b] = { a, b,{ true, true, true, true }, false };
 		}
 	}
+
+	current = grid[0][0];
+	grid[0][0].visited = true;
 
 	int a = current.x, b = current.y;
 	stack.push_back(current);
@@ -24,7 +24,7 @@ void Maze::setup()
 		Cell next = checkNeightbors(a, b);
 		a = next.x;
 		b = next.y;
-		grid[a][b]->visited = true;
+		grid[a][b].visited = true;
 		if (!pop)
 		{
 			//Step 2
@@ -42,22 +42,23 @@ void Maze::setup()
 			b = current.y;
 			stack.pop_back();
 		}
-		draw();
 	} while (stack.size() > 0);
+
+	draw();
 }
 
 void Maze::drawLines(const int& a, const int& b)
 {
-	if (grid[a][b]->visited)
+	if (grid[a][b].visited)
 	{
-		if (grid[a][b]->walls[1])
+		if (grid[a][b].walls[1])
 		{
 			std::cout << "|";
 		}
 		else {
 			std::cout << " ";
 		}
-		if (grid[a][b]->walls[0])
+		if (grid[a][b].walls[0])
 		{
 			std::cout << "^";
 		}
@@ -66,37 +67,15 @@ void Maze::drawLines(const int& a, const int& b)
 			std::cout << " ";
 		}
 
-		/*if (grid[a][b]->numb > 9)
-		{
-		std::cout << grid[a][b]->numb;
-		if (grid[a][b]->walls[2])
-		{
-		std::cout << "_";
-		}
-		else {
-		std::cout << " ";
-		}
-		}
-		else {
-		std::cout << grid[a][b]->numb;
-		if (grid[a][b]->walls[2])
-		{
-		std::cout << "_";
-		}
-		else {
-		std::cout << " ";
-		}
-		}*/
-
 		std::cout << "*";
-		if (grid[a][b]->walls[2])
+		if (grid[a][b].walls[2])
 		{
 			std::cout << "_";
 		}
 		else {
 			std::cout << " ";
 		}
-		if (grid[a][b]->walls[3])
+		if (grid[a][b].walls[3])
 		{
 			std::cout << "|";
 		}
@@ -106,28 +85,28 @@ void Maze::drawLines(const int& a, const int& b)
 	}
 	else
 	{
-		if (grid[a][b]->walls[1])
+		if (grid[a][b].walls[1])
 		{
 			std::cout << "|";
 		}
 		else {
 			std::cout << " ";
 		}
-		if (grid[a][b]->walls[0])
+		if (grid[a][b].walls[0])
 		{
 			std::cout << "^";
 		}
 		else {
 			std::cout << " ";
 		}
-		if (grid[a][b]->walls[2])
+		if (grid[a][b].walls[2])
 		{
 			std::cout << "_";
 		}
 		else {
 			std::cout << " ";
 		}
-		if (grid[a][b]->walls[3])
+		if (grid[a][b].walls[3])
 		{
 			std::cout << "|";
 		}
@@ -148,15 +127,13 @@ void Maze::draw()
 		std::cout << "\n";
 	}
 	std::cout << "\n\n";
-	//system("pause");
 }
 
 Maze::Cell Maze::checkNeightbors(const int& a, const int& b)
 {
-	//neighbors
 	std::vector<int> arrToRandomNumber(4);
 
-	if (b - 1 > 0 && !grid[a][b - 1]->visited)
+	if (b > 0 && !grid[a][b - 1].visited)
 	{
 		arrToRandomNumber[0] = 0;
 	}
@@ -165,7 +142,7 @@ Maze::Cell Maze::checkNeightbors(const int& a, const int& b)
 		arrToRandomNumber[0] = -1;
 	}
 
-	if (a + 1 < cols && !grid[a + 1][b]->visited)
+	if (a + 1 < cols && !grid[a + 1][b].visited)
 	{
 		arrToRandomNumber[1] = 1;
 	}
@@ -174,7 +151,7 @@ Maze::Cell Maze::checkNeightbors(const int& a, const int& b)
 		arrToRandomNumber[1] = -1;
 	}
 
-	if (b + 1 < rows && !grid[a][b + 1]->visited)
+	if (b + 1  < rows && !grid[a][b + 1].visited)
 	{
 		arrToRandomNumber[2] = 2;
 	}
@@ -183,7 +160,7 @@ Maze::Cell Maze::checkNeightbors(const int& a, const int& b)
 		arrToRandomNumber[2] = -1;
 	}
 
-	if (a - 1 > 0 && !grid[a - 1][b]->visited)
+	if (a > 0 && !grid[a - 1][b].visited)
 	{
 		arrToRandomNumber[3] = 3;
 	}
@@ -208,41 +185,33 @@ Maze::Cell Maze::checkNeightbors(const int& a, const int& b)
 			random_element = arrToRandomNumber[dist(engine)];
 		} while (random_element == -1);
 
-		conta++;
 		pop = false;
 
 		if (random_element == 0)
 		{
-			grid[a][b - 1]->visited = true;
-			grid[a][b - 1]->numb = conta;
-			return *grid[a][b - 1];
+			grid[a][b - 1].visited = true;
+			return grid[a][b - 1];
 		}
 		else if (random_element == 1)
 		{
-			grid[a + 1][b]->visited = true;
-			grid[a + 1][b]->numb = conta;
-			return *grid[a + 1][b];
+			grid[a + 1][b].visited = true;
+			return grid[a + 1][b];
 		}
 		else if (random_element == 2)
 		{
-			grid[a][b + 1]->visited = true;
-			grid[a][b + 1]->numb = conta;
-			return *grid[a][b + 1];
+			grid[a][b + 1].visited = true;
+			return grid[a][b + 1];
 		}
 		else if (random_element == 3)
 		{
-			grid[a - 1][b]->visited = true;
-			grid[a - 1][b]->numb = conta;
-			return *grid[a - 1][b];
+			grid[a - 1][b].visited = true;
+			return grid[a - 1][b];
 		}
 	}
 	else {
 		if (stack.size() > 0)
 		{
 			pop = true;
-		}
-		else {
-			std::cout << "\n\nFINISH\n\n";
 		}
 	}
 
@@ -253,24 +222,24 @@ void Maze::removeWall(Maze::Cell& current, Maze::Cell& next)
 	int asseY = current.x - next.x;
 	if (asseY == 1)
 	{
-		grid[current.x][current.y]->walls[0] = false;
-		grid[next.x][next.y]->walls[2] = false;
+		grid[current.x][current.y].walls[0] = false;
+		grid[next.x][next.y].walls[2] = false;
 	}
 	else if (asseY == -1)
 	{
-		grid[current.x][current.y]->walls[2] = false;
-		grid[next.x][next.y]->walls[0] = false;
+		grid[current.x][current.y].walls[2] = false;
+		grid[next.x][next.y].walls[0] = false;
 	}
 
 	int asseX = current.y - next.y;
 	if (asseX == 1)
 	{
-		grid[current.x][current.y]->walls[1] = false;
-		grid[next.x][next.y]->walls[3] = false;
+		grid[current.x][current.y].walls[1] = false;
+		grid[next.x][next.y].walls[3] = false;
 	}
 	else if (asseX == -1)
 	{
-		grid[current.x][current.y]->walls[3] = false;
-		grid[next.x][next.y]->walls[1] = false;
+		grid[current.x][current.y].walls[3] = false;
+		grid[next.x][next.y].walls[1] = false;
 	}
 }
