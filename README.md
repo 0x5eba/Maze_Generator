@@ -2,10 +2,10 @@
 A Maze Generated and Solver with Backtrack Algorithm
 
 ### Key: 
-* "|" = rigth/left wall
+* "|" = Rigth/Left wall
 
-* "^" = upper wall
+* "^" = Upper wall
 
-* "_" = lower wall
+* "_" = Lower wall
 
-* "*" = visited
+* "X" = Path
