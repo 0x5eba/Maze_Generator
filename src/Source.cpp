@@ -1,10 +1,11 @@
-﻿#include "Maze.h"
+#include "Maze.h"
 
 
 int main()
 {
 	Maze obj;
-	obj.setup();
+	
+	obj.initialize();
 
 	system("pause");
 	return 0;
