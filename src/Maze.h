@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <random>
+#include <Windows.h>
 
 
 class Maze {
@@ -23,9 +24,9 @@ private:
 
 private:
 	Cell checkNeightbors(const int& a, const int& b);
-	void drawLines(const int& a, const int& b);
+	void drawLines(const int& a, const int& b, bool path);
 	void setup();
-	void draw();
+	void draw(bool path);
 	void removeWall(Cell& current, Cell& next);
 
 private:
@@ -33,9 +34,12 @@ private:
 	std::vector<Cell> stack;
 	Cell current;
 
+	std::vector<int> distance;
 	int cols;
 	int rows;
 	bool pop;
 	bool reached;
-	int coordinateX, coordinateY;	
+
+private:
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 };
