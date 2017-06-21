@@ -1,5 +1,5 @@
 # Maze_Generator
-A Maze generated with Backtrack Algorithm
+A Maze Generated and Solver with Backtrack Algorithm
 
 ### Key: 
 * "|" = rigth/left wall
