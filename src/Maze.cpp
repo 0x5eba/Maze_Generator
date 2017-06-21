@@ -5,27 +5,33 @@ void Maze::initialize()
 {
 	reached = false;
 	do {
-		do {
-			std::cout << "\nInsert a number of total rows: ";
-			std::cin >> Maze::rows;
-			if (Maze::rows < 0 || Maze::rows > 45)
-				std::cout << "\nInsert a number between 0 and 45\n";
-		} while (Maze::rows < 0 || Maze::rows > 45);
+		std::cout << "\nInsert a number of total rows/columns: ";
+		std::cin >> rows;
+		if (rows < 0 || rows > 45)
+			std::cout << "\nInsert a number between 0 and 45\n";
+	} while (rows < 0 || rows > 45);
+	cols = rows;
 
-		do
-		{
-			std::cout << "Insert a number of total columns: ";
-			std::cin >> Maze::cols;
-			if (Maze::cols < 0 || Maze::cols > 45)
-				std::cout << "\nInsert a number between 0 and 45\n";
-		} while (Maze::cols < 0 || Maze::cols > 45);
 
-		if (Maze::rows != Maze::cols)
-			std::cout << "\nInsert 2 equal numbers\n\n";
-	} while (Maze::rows != Maze::cols);
+	distance.resize(3);
+	do {
+		std::cout << "\nInsert a number that is the distance from start to end: ";
+		std::cin >> distance[0];
+		if (distance[0] < 2 || distance[0] > cols+rows-1)
+			std::cout << "\nInsert a number between 2 and " << cols + rows - 1 << "\n";
+	} while (distance[0] < 2 || distance[0] > cols + rows - 1);
 
-	coordinateX = cols - 1;
-	coordinateY = rows - 1;
+	if (distance[0] < cols)
+	{
+		distance[2] = 0;
+		distance[1] = distance[0]-1;
+	}
+	if (distance[0] >= cols)
+	{
+		distance[1] = cols - 1;
+		distance[2] = distance[0] - cols;
+	}
+
 	Maze::setup();
 }
 
@@ -51,17 +57,21 @@ void Maze::setup()
 	{
 		//Step 1
 		Cell next = checkNeightbors(a, b);
-		a = next.x;
-		b = next.y;
-		grid[a][b].visited = true;
-		
+
 		if (!pop)
 		{
-			if (reached == false)
-				grid[a][b].solve = true;	
-			if (a == coordinateX && b == coordinateY)
-				reached = true;
+			a = next.x;
+			b = next.y;
+			grid[a][b].visited = true;
 
+			if (reached == false)
+				grid[a][b].solve = true;
+			if (a == distance[1] && b == distance[2])
+			{
+				grid[a][b].solve = true;
+				reached = true;
+			}
+				
 			//Step 2
 			stack.push_back(current);
 
@@ -80,17 +90,23 @@ void Maze::setup()
 			a = current.x;
 			b = current.y;
 
-			if (reached == false)
-				grid[a][b].solve = false;
+			/*if (reached == false)
+				grid[a][b].solve = false;*/
 
 			stack.pop_back();
 		}
 	} while (stack.size() > 0);
 
-	draw();
+	system("cls");
+	std::cout << "\nAll the map\n\n";
+	draw(false);
+
+	SetConsoleTextAttribute(h, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+	std::cout << "\n\nPath of exit\n\n";
+	draw(true);
 }
 
-void Maze::drawLines(const int& a, const int& b)
+void Maze::drawLines(const int& a, const int& b, bool path)
 {
 	if (grid[a][b].visited)
 	{
@@ -111,9 +127,16 @@ void Maze::drawLines(const int& a, const int& b)
 		}
 
 		
-		if (grid[a][b].solve)
+		if (grid[a][b].solve && path)
 		{
-			std::cout << "*";
+			if ((a == 0 && b == 0) || (a == distance[1] && b == distance[2]))
+				SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+			else
+				SetConsoleTextAttribute(h, FOREGROUND_INTENSITY | FOREGROUND_GREEN);
+			
+			std::cout << "X";
+
+			SetConsoleTextAttribute(h, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		}
 		else {
 			std::cout << " ";
@@ -168,13 +191,13 @@ void Maze::drawLines(const int& a, const int& b)
 	}
 }
 
-void Maze::draw()
+void Maze::draw(bool path)
 {
 	for (int a = 0; a < rows; ++a)
 	{
 		for (int b = 0; b < cols; ++b)
 		{
-			drawLines(a, b);
+			drawLines(a, b, path);
 		}
 		std::cout << "\n";
 	}
@@ -242,22 +265,18 @@ Maze::Cell Maze::checkNeightbors(const int& a, const int& b)
 
 		if (random_element == 0)
 		{
-			grid[a][b - 1].visited = true;
 			return grid[a][b - 1];
 		}
 		else if (random_element == 1)
 		{
-			grid[a + 1][b].visited = true;
 			return grid[a + 1][b];
 		}
 		else if (random_element == 2)
 		{
-			grid[a][b + 1].visited = true;
 			return grid[a][b + 1];
 		}
 		else if (random_element == 3)
 		{
-			grid[a - 1][b].visited = true;
 			return grid[a - 1][b];
 		}
 	}
